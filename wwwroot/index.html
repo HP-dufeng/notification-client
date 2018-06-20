@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+    <body>
+        <div id="app">
+            <h3>Hub API</h3>
+            <!-- <form v-on:submit.prevent="addMessage">
+                <input type="text" v-model="newMessage" />
+                <input type="submit" value="Send" />
+            </form> -->
+
+            <ul>
+                <li v-for="message in messages">{{ message }}</li>
+            </ul>
+        </div>
+
+        <script src="lib/abp.js"></script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.0.0/dist/browser/signalr.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/msgpack5@4.2.0/dist/msgpack5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr-protocol-msgpack@1.0.0/dist/browser/signalr-protocol-msgpack.min.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+
+        <script>
+            (async function(){
+                const access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InpZdWFJT3dVaTJkM2VjaGdGWjg0NTV6bHJBNCIsImtpZCI6InpZdWFJT3dVaTJkM2VjaGdGWjg0NTV6bHJBNCJ9.eyJpc3MiOiJodHRwczovL3d1Y2MuY2VmY2Zjby5jb20vaWRlbnRpdHkiLCJhdWQiOiJodHRwczovL3d1Y2MuY2VmY2Zjby5jb20vaWRlbnRpdHkvcmVzb3VyY2VzIiwiZXhwIjoxNTI5NDY3MzE2LCJuYmYiOjE1Mjk0NjAxMTYsImNsaWVudF9pZCI6IlJCUyIsInNjb3BlIjpbIm9mZmxpbmVfYWNjZXNzIiwib3BlbmlkIiwicHJvZmlsZSIsInJvbGVzIiwicnNfdXNlckluZm8iXSwic3ViIjoiOWRiYjRiNmUtMjJiMS00OTQ2LWE2MzAtMTgwODhiYjQwNjI3IiwiYXV0aF90aW1lIjoxNTI5NDYwMTE2LCJpZHAiOiJpZHNydiIsInByZWZlcnJlZF91c2VybmFtZSI6IjAwMDk2OSIsInBob25lX251bWJlciI6IjEzODE2NjIwOTQyIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjoiZmFsc2UiLCJGdWxsTmFtZSI6IuadnOmUiyIsIm5hbWUiOiIwMDA5NjkiLCJTYWxlc0RlcGFydG1lbnQiOiLlvIDlj5Hpg6giLCJVc2VySWQiOiI0OTciLCJhbXIiOlsicGFzc3dvcmQiXX0.DLOFPsoMQJGqkydWU5y1LX31j0JVP_QFjXGscGBDH2dyrlV3EknXhP10_BCTY3UaYynqsai9Dp0wsLX0AsFDgBZVTvWcP_nki9gAcaqZepG7AHo_dNlqCJCT7oKTS7nOQHodVhmNtnaidIsR_oBOKT6JqyKxObGEmarfTy2FxbPUdBbm3Pjb8c98g-xy7e_I2vKRXn2lKBlny-_xaelxLyQt2DxixLwFFfsKsm-1M8BtHbH9_K5h1UmVs0PKO1SiPdLx3kIEmo9sS6oiQY3tr4q6R0xXlfbp3eNcC4D-ErXA2Y8azFbe8Dd5FDqPZS9jHmX_q1TtBcRjpoBvtCaGYg"
+                const connection = new signalR.HubConnectionBuilder()
+                                    .withUrl(`https://localhost:5001/signalr?access_token=${access_token}`)
+                                    // .withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol())
+                                    .build();
+
+                const app = new Vue({
+                    el: "#app",
+                    data: {
+                        messages: [],
+                        newMessage: null,
+                    },
+                    methods: {
+                        // async addMessage(){
+                        //     // await connection.invoke("Send", { Message: this.newMessage });
+                        //     // this.newMessage = null;
+                            
+                        // },
+                    }
+                });
+
+                // Register to get notifications
+                connection.on("getNotification", notification => {
+                    console.log(notification);
+                    abp.event.trigger('abp.notifications.received', notification);
+                })
+     
+
+                abp.event.on('abp.notifications.received', function (userNotification) {
+                    if (userNotification.notification.data.type === 'Abp.Notifications.MessageNotificationData') {
+                        app.messages.push('New simple notification: ' + userNotification.notification.data.message);
+                    } else if (userNotification.notification.data.type === 'Abp.Notifications.LocalizableMessageNotificationData') {
+                        // ...
+                }
+            });
+
+
+                await connection.start();
+  
+            })();
+
+
+            
+
+        </script>
+    </body>
+</html>
